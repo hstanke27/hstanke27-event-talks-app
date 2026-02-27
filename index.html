@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tech Talks Day Event</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 1em 0;
+            text-align: center;
+        }
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+        #search-bar {
+            margin-bottom: 20px;
+            padding: 10px;
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .schedule-item {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .schedule-item.lunch {
+            background-color: #e0f7fa;
+            border-color: #b2ebf2;
+            text-align: center;
+            font-weight: bold;
+        }
+        .talk-time {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #555;
+            margin-bottom: 5px;
+        }
+        .talk-title {
+            color: #0056b3;
+            margin-top: 0;
+            margin-bottom: 5px;
+        }
+        .talk-speakers {
+            font-style: italic;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        .talk-category {
+            font-size: 0.9em;
+            color: #007bff;
+            margin-bottom: 10px;
+        }
+        .talk-description {
+            font-size: 0.9em;
+            line-height: 1.5;
+            color: #555;
+        }
+        footer {
+            text-align: center;
+            padding: 20px 0;
+            color: #666;
+            font-size: 0.8em;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Tech Talks Day</h1>
+        <p>A full day of insightful technical talks.</p>
+    </header>
+
+    <div class="container">
+        <input type="text" id="search-bar" placeholder="Search by category (e.g., Web, Security)...">
+        <div id="schedule">
+            <!-- Schedule items will be rendered here by JavaScript -->
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Tech Talks Day Event</p>
+    </footer>
+
+    <script>
+        const talksData = [
+            {
+                title: "Introduction to WebAssembly",
+                speakers: ["Dr. Evelyn Reed"],
+                category: ["Web", "Performance", "Rust"],
+                duration: 60, // minutes
+                description: "Explore the basics of WebAssembly, its benefits for web performance, and how to get started with Rust for Wasm development."
+            },
+            {
+                title: "Microservices Patterns in Kubernetes",
+                speakers: ["Alex Chen", "Maria Rodriguez"],
+                category: ["Cloud", "Microservices", "Kubernetes"],
+                duration: 60,
+                description: "A deep dive into common microservices architectural patterns and their implementation on Kubernetes."
+            },
+            {
+                title: "Secure Coding Practices for Node.js",
+                speakers: ["Jordan Lee"],
+                category: ["Security", "Node.js", "Backend"],
+                duration: 60,
+                description: "Learn essential secure coding practices to protect your Node.js applications from common vulnerabilities."
+            },
+            {
+                title: "The Future of Frontend Frameworks",
+                speakers: ["Sophia Miller"],
+                category: ["Frontend", "JavaScript", "Frameworks"],
+                duration: 60,
+                description: "An overview of emerging trends and innovations in the JavaScript frontend ecosystem, including new frameworks and tooling."
+            },
+            {
+                title: "Data Visualization with D3.js",
+                speakers: ["David Kim"],
+                category: ["Data", "Frontend", "Visualization"],
+                duration: 60,
+                description: "Master the art of creating compelling and interactive data visualizations using the powerful D3.js library."
+            },
+            {
+                title: "DevOps for AI/ML Workflows",
+                speakers: ["Emily White", "Daniel Brown"],
+                category: ["DevOps", "AI/ML", "Automation"],
+                duration: 60,
+                description: "Best practices for implementing DevOps principles in machine learning and artificial intelligence pipelines."
+            }
+        ];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const scheduleElement = document.getElementById('schedule');
+            const searchBar = document.getElementById('search-bar');
+
+            let currentHour = 10;
+            let currentMinute = 0;
+
+            const formatTime = (hour, minute) => {
+                const h = String(hour).padStart(2, '0');
+                const m = String(minute).padStart(2, '0');
+                return `${h}:${m}`;
+            };
+
+            const addMinutes = (hour, minute, minutesToAdd) => {
+                let newMinute = minute + minutesToAdd;
+                let newHour = hour + Math.floor(newMinute / 60);
+                newMinute = newMinute % 60;
+                return { hour: newHour, minute: newMinute };
+            };
+
+            const generateSchedule = (filterCategory = '') => {
+                scheduleElement.innerHTML = ''; // Clear previous schedule
+
+                let talkIndex = 0;
+                let scheduleItems = [];
+
+                for (let i = 0; i < talksData.length + 1; i++) { // +1 for lunch
+                    const startTime = formatTime(currentHour, currentMinute);
+                    let endTimeObj;
+
+                    if (i === 3) { // After 3rd talk, add lunch
+                        endTimeObj = addMinutes(currentHour, currentMinute, 60);
+                        scheduleItems.push({
+                            type: 'lunch',
+                            startTime: startTime,
+                            endTime: formatTime(endTimeObj.hour, endTimeObj.minute)
+                        });
+                        currentHour = endTimeObj.hour;
+                        currentMinute = endTimeObj.minute;
+                    }
+
+                    if (talkIndex < talksData.length) {
+                        const talk = talksData[talkIndex];
+
+                        // Filter logic
+                        const categoriesMatch = filterCategory
+                            ? talk.category.some(cat => cat.toLowerCase().includes(filterCategory.toLowerCase()))
+                            : true;
+
+                        if (categoriesMatch) {
+                            endTimeObj = addMinutes(currentHour, currentMinute, talk.duration);
+                            scheduleItems.push({
+                                type: 'talk',
+                                talk: talk,
+                                startTime: startTime,
+                                endTime: formatTime(endTimeObj.hour, endTimeObj.minute)
+                            });
+                        } else {
+                            // If talk doesn't match filter, still advance time for rendering
+                            endTimeObj = addMinutes(currentHour, currentMinute, talk.duration);
+                        }
+                        currentHour = endTimeObj.hour;
+                        currentMinute = endTimeObj.minute;
+                        talkIndex++;
+                    }
+
+                    // Add transition time, except after the last talk or before lunch
+                    if (talkIndex < talksData.length && i !== 2) { // i=2 is before lunch
+                        endTimeObj = addMinutes(currentHour, currentMinute, 10);
+                        scheduleItems.push({
+                            type: 'transition',
+                            startTime: formatTime(currentHour, currentMinute),
+                            endTime: formatTime(endTimeObj.hour, endTimeObj.minute)
+                        });
+                        currentHour = endTimeObj.hour;
+                        currentMinute = endTimeObj.minute;
+                    }
+                }
+
+                // Render filtered schedule items
+                scheduleItems.forEach(item => {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.classList.add('schedule-item');
+
+                    if (item.type === 'lunch') {
+                        itemDiv.classList.add('lunch');
+                        itemDiv.innerHTML = `
+                            <p class="talk-time">${item.startTime} - ${item.endTime}</p>
+                            <h2>Lunch Break</h2>
+                        `;
+                    } else if (item.type === 'talk') {
+                        const talk = item.talk;
+                        itemDiv.innerHTML = `
+                            <p class="talk-time">${item.startTime} - ${item.endTime}</p>
+                            <h3 class="talk-title">${talk.title}</h3>
+                            <p class="talk-speakers">Speaker(s): ${talk.speakers.join(', ')}</p>
+                            <p class="talk-category">Categories: ${talk.category.join(', ')}</p>
+                            <p class="talk-description">${talk.description}</p>
+                        `;
+                    } else if (item.type === 'transition') {
+                         itemDiv.style.display = 'none'; // Hide transitions in display
+                    }
+                    scheduleElement.appendChild(itemDiv);
+                });
+            };
+            generateSchedule(); // Initial render
+
+            searchBar.addEventListener('input', (event) => {
+                // Reset time before filtering
+                currentHour = 10;
+                currentMinute = 0;
+                generateSchedule(event.target.value);
+            });
+        });
+    </script>
+</body>
+</html>

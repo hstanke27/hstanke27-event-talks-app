@@ -1,0 +1,21 @@
+# Node.js
+node_modules/
+/dist/
+/build/
+
+# Environment variables
+.env
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+/tmp/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Gemini CLI specific
+.gemini/
