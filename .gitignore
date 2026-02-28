@@ -1,21 +1,9 @@
-# Node.js
-node_modules/
-/dist/
-/build/
+# Operating System Files
+.DS_Store
 
-# Environment variables
-.env
-
-# Logs
+# Log files
 *.log
 
-# Temporary files
-*.tmp
-/tmp/
-
-# OS generated files
-.DS_Store
-Thumbs.db
-
-# Gemini CLI specific
-.gemini/
+# Python specific
+__pycache__/
+venv/
